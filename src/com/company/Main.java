@@ -10,8 +10,6 @@ import com.company.services.MenuService;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-
-//        FileService.overwrite();
         MenuService.mainMenu();
     }
 }

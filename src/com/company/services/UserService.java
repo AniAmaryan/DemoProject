@@ -1,10 +1,9 @@
 package com.company.services;
 
-import com.company.Main;
+import com.company.model.FilePaths;
 import com.company.model.User;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
@@ -15,7 +14,6 @@ import java.util.UUID;
  * @author Ani Amaryan
  */
 public class UserService {
-    private static final String PATH = "C:\\Users\\User\\IdeaProjects\\armBay\\src\\com\\company\\users.txt";
     private final Scanner scanner = new Scanner(System.in);
     User user;
 
@@ -25,7 +23,7 @@ public class UserService {
      * @return new User
      * @throws IOException
      */
-    public User create() throws IOException {
+    public User create() throws Exception {
         user = new User();
         System.out.println("Please enter your full name");
         user.setFullName(scanner.nextLine());
@@ -48,10 +46,9 @@ public class UserService {
      * This method add the user data to the database.
      *
      * @param user
-     * @throws Exception
      */
-    public void writeAllData(User user) throws Exception {
-        FileService.write(PATH, user.toString());
+    public void writeAllData(User user) {
+        FileService.writeData(FilePaths.USERS_PATH, user.toString());
     }
 
     /**
@@ -65,7 +62,7 @@ public class UserService {
         String userName = scanner.nextLine();
         System.out.println("Please enter your password");
         String password = scanner.nextLine();
-        List<String> read = FileService.read(PATH);
+        List<String> read = FileService.read(FilePaths.USERS_PATH);
         boolean isLoginSuccess = false;
         User user = new User();
         for (String s : read) {

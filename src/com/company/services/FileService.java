@@ -1,15 +1,16 @@
 package com.company.services;
 
-import com.company.model.User;
-
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * This class works with files
@@ -29,19 +30,8 @@ public class FileService {
         return Files.readAllLines(Paths.get(path));
     }
 
-    /**
-     * This method writes the text specified in the parameters to the path
-     *
-     * @param path
-     * @param text
-     * @throws IOException
-     */
-    public static void write(String path, String text) throws IOException {
-        Files.write(Paths.get(path), text.getBytes(), StandardOpenOption.APPEND);
-    }
+    public static void changeBalance(String path, UUID userId, int newBalance) throws IOException {
 
-    public static void changeBalance(User user, int newBalance) throws IOException {
-        final String path = "C:\\Users\\User\\IdeaProjects\\armBay\\src\\com\\company\\users.txt";
         Path pathForOverwrite = Paths.get(path);
         Charset charset = StandardCharsets.UTF_8;
 
@@ -49,9 +39,78 @@ public class FileService {
         StringBuilder changedString = new StringBuilder();
         for (String s : read) {
             String[] line = s.split(",");
-            if (String.valueOf(user.getId()).equals(line[0])) {
+            if (String.valueOf(userId).equals(line[0])) {
                 line[5] = String.valueOf(Integer.parseInt(line[5]) + newBalance);
-                user.setBalance(user.getBalance() + newBalance);
+            }
+            for (int j = 0; j < line.length; j++) {
+                changedString.append(line[j]);
+                if (j != line.length - 1) {
+                    changedString.append(",");
+                } else {
+                    changedString.append("\n");
+                }
+            }
+        }
+        String result = changedString.toString();
+        Files.writeString(pathForOverwrite, result, charset);
+    }
+
+    public static void writeData(String path, String data) {
+        FileWriter fw = null;
+        BufferedWriter bw = null;
+        PrintWriter pw = null;
+        try {
+            fw = new FileWriter(path, true);
+            bw = new BufferedWriter(fw);
+            pw = new PrintWriter(bw);
+            pw.println(data);
+            pw.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                pw.close();
+                bw.close();
+                fw.close();
+            } catch (IOException io) {
+                io.printStackTrace();
+            }
+        }
+    }
+
+    public static void removeLine(String path, String electronicId) throws IOException {
+        Path pathForOverwrite = Paths.get(path);
+        Charset charset = StandardCharsets.UTF_8;
+
+        List<String> read = read(path);
+        StringBuilder changedString = new StringBuilder();
+        for (String s : read) {
+            String[] line = s.split(",");
+            if (!(line[0].equals(electronicId))) {
+                for (int j = 0; j < line.length; j++) {
+                    changedString.append(line[j]);
+                    if (j != line.length - 1) {
+                        changedString.append(",");
+                    } else {
+                        changedString.append("\n");
+                    }
+                }
+            }
+        }
+        String result = changedString.toString();
+        Files.writeString(pathForOverwrite, result, charset);
+    }
+
+    public static void changeUserId(String path, String userId, String soldProductId) throws IOException {
+        Path pathForOverwrite = Paths.get(path);
+        Charset charset = StandardCharsets.UTF_8;
+
+        List<String> read = read(path);
+        StringBuilder changedString = new StringBuilder();
+        for (String s : read) {
+            String[] line = s.split(",");
+            if ((line[1].equals(soldProductId))) {
+                line[0] = userId;
             }
             for (int j = 0; j < line.length; j++) {
                 changedString.append(line[j]);

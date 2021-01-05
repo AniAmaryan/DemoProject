@@ -7,6 +7,7 @@ import java.util.UUID;
 
 /**
  * The User class is a simple container for user data.
+ *
  * @author Ani amaryan
  */
 public class User {
@@ -21,15 +22,23 @@ public class User {
 
     /**
      * toString returns string for writing in database.
+     *
      * @return id, full name, username, email, password and balance
      */
     @Override
     public String toString() {
         return getId() + "," + getFullName() + "," + getUsername() + "," + getEmail() + ","
-                + getPassword() + "," + getBalance() + "\n";
+                + getPassword() + "," + getBalance();
     }
 
-    //Add personal data method without pass
+    public String userPersonalData() {
+        return "ID = '" + getId() + '\'' + "\n" +
+                "Full name = '" + getFullName() + '\'' + "\n" +
+                "Username = '" + getUsername() + '\'' + "\n" +
+                "Email = '" + getEmail() + '\'' + "\n" +
+                "Balance = '" + getBalance() + '\'' + "\n";
+    }
+
 
     public User(String fullName, String username, String email, String password, int balance) {
         this.id = UUID.randomUUID();

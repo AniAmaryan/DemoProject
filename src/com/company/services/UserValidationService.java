@@ -1,5 +1,10 @@
 package com.company.services;
 
+import com.company.exceptions.UserBalanceValidationException;
+import com.company.exceptions.UserFullNameValidationException;
+import com.company.exceptions.UserPasswordValidationException;
+import com.company.exceptions.UserUsernameValidationException;
+import com.company.model.FilePaths;
 import com.company.model.User;
 import java.io.IOException;
 import java.util.List;
@@ -8,7 +13,6 @@ import java.util.List;
  * This class for validation
  */
 public class UserValidationService {
-    private static final String PATH = "C:\\Users\\User\\IdeaProjects\\armBay\\src\\com\\company\\users.txt";
 
     /**
      * This method checks if the email is valid or not with regex
@@ -25,10 +29,10 @@ public class UserValidationService {
      * This method checks if the full name contain only letters
      * @param fullName
      */
-    protected static void isValidFullName(String fullName) {
+    protected static void isValidFullName(String fullName) throws Exception {
         String regex = "^[\\p{L} .'-]+$";
         if (!fullName.matches(regex)) {
-            System.out.print("Invalid full name");
+            throw new UserFullNameValidationException();
         }
     }
 
@@ -36,7 +40,7 @@ public class UserValidationService {
      * This method check password
      * @param password
      */
-    protected static void isValidPassword(String password) {
+    protected static void isValidPassword(String password) throws Exception {
         int countOfUppercase = 0;
         int countOfDigits = 0;
         char chars;
@@ -49,7 +53,17 @@ public class UserValidationService {
             }
         }
         if (password.length() < 8 || countOfUppercase < 2 || countOfDigits < 3) {
-            System.out.print("Invalid password");
+            throw new UserPasswordValidationException();
+        }
+    }
+
+    /**
+     * This method check balance
+     * @param balance
+     */
+    protected static void isValidBalance(int balance) throws UserBalanceValidationException {
+        if(balance <0){
+           throw new UserBalanceValidationException();
         }
     }
 
@@ -58,9 +72,9 @@ public class UserValidationService {
      * @param username
      * @throws IOException
      */
-    protected static void isValidUsername(String username) throws IOException {
+    protected static void isValidUsername(String username) throws Exception {
         if (!isValidUsernameLength(username) || !isUsernameDuplicate(username)) {
-            System.out.print("Invalid username");
+            throw new UserUsernameValidationException();
         }
     }
 
@@ -84,7 +98,7 @@ public class UserValidationService {
      * @throws IOException
      */
     protected static boolean isUsernameDuplicate(String username) throws IOException {
-        List<String> read = FileService.read(PATH);
+        List<String> read = FileService.read(FilePaths.USERS_PATH);
 
         for (String s : read) {
             String[] line = s.split(",");
@@ -102,10 +116,11 @@ public class UserValidationService {
      * @param user
      * @throws IOException
      */
-    public static void isValidUser(User user) throws IOException {
-        isValidUsername(user.getUsername());
-        isValidPassword(user.getPassword());
-        isValidEmail(user.getEmail());
+    public static void isValidUser(User user) throws Exception {
         isValidFullName(user.getFullName());
+        isValidUsername(user.getUsername());
+        isValidEmail(user.getEmail());
+        isValidPassword(user.getPassword());
+        isValidBalance(user.getBalance());
     }
 }
