@@ -1,2 +1,2 @@
 # DemoProject
-Demo project for PicsArt
+I created something like an ebay, and tried to add the similar functionality in the scope of what we have learned from those classes. In this app you can registrate and log into your account. There are few types of electronical products you can trade with other users, you can buy, sell and etc. User has balance and some personal data in his account. This balance reduces when you buy pruduct and the products owner id changes to new id of the buyer and when you sell you get money on you balance with the amount of sold electronic.
