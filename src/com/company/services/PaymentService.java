@@ -4,17 +4,32 @@ import com.company.exceptions.ElectronicNotFoundException;
 import com.company.exceptions.NotEnoughFoundsException;
 import com.company.exceptions.SellerNotFoundException;
 import com.company.model.*;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * This class for payment.
+ *
+ * @author Ani Amaryan
+ */
 public class PaymentService {
 
-    public static void makePayment(User buyer, String electronicId, String electronicType) throws Exception {
+    /**
+     * This method gets from params buyer, electronic id and electronic type. And depend electronic type
+     * param sends it to the right service.
+     *
+     * @param buyer
+     * @param electronicId
+     * @param electronicType
+     * @throws Exception
+     */
+    public static void makePayment(User buyer, String electronicId, String electronicType) {
         Electronics electronic = null;
         User seller = null;
         switch (electronicType) {
-            case "Notebook":
+            case "Notebook" -> {
                 NotebookService notebookService = new NotebookService();
                 Notebook[] notebooks = notebookService.readNotebookData();
                 for (Notebook notebook : notebooks) {
@@ -24,10 +39,14 @@ public class PaymentService {
                     }
                 }
                 seller = findSeller(electronic);
-                paymentValidation(buyer, seller, electronic);
+                try {
+                    paymentValidation(buyer, seller, electronic);
+                } catch (ElectronicNotFoundException | NotEnoughFoundsException | SellerNotFoundException e) {
+                    e.printStackTrace();
+                }
                 makeTransaction(FilePaths.NOTEBOOK_PATH, buyer.getId(), seller.getId(), electronic.getId(), electronic.getPrice());
-                break;
-            case "Pc":
+            }
+            case "Pc" -> {
                 PCService pcService = new PCService();
                 PC[] pcs = pcService.readPCData();
                 for (PC pc : pcs) {
@@ -37,10 +56,14 @@ public class PaymentService {
                     }
                 }
                 seller = findSeller(electronic);
-                paymentValidation(buyer, seller, electronic);
+                try {
+                    paymentValidation(buyer, seller, electronic);
+                } catch (ElectronicNotFoundException | NotEnoughFoundsException | SellerNotFoundException e) {
+                    e.printStackTrace();
+                }
                 makeTransaction(FilePaths.PC_PATH, buyer.getId(), seller.getId(), electronic.getId(), electronic.getPrice());
-                break;
-            case "Phone":
+            }
+            case "Phone" -> {
                 PhoneService phoneService = new PhoneService();
                 Phone[] phones = phoneService.readPhoneData();
                 for (Phone phone : phones) {
@@ -50,10 +73,14 @@ public class PaymentService {
                     }
                 }
                 seller = findSeller(electronic);
-                paymentValidation(buyer, seller, electronic);
+                try {
+                    paymentValidation(buyer, seller, electronic);
+                } catch (ElectronicNotFoundException | NotEnoughFoundsException | SellerNotFoundException e) {
+                    e.printStackTrace();
+                }
                 makeTransaction(FilePaths.PHONE_PATH, buyer.getId(), seller.getId(), electronic.getId(), electronic.getPrice());
-                break;
-            case "Tablet":
+            }
+            case "Tablet" -> {
                 TabletService tabletService = new TabletService();
                 Tablet[] tablets = tabletService.readTabletData();
                 for (Tablet tablet : tablets) {
@@ -63,10 +90,14 @@ public class PaymentService {
                     }
                 }
                 seller = findSeller(electronic);
-                paymentValidation(buyer, seller, electronic);
+                try {
+                    paymentValidation(buyer, seller, electronic);
+                } catch (ElectronicNotFoundException | NotEnoughFoundsException | SellerNotFoundException e) {
+                    e.printStackTrace();
+                }
                 makeTransaction(FilePaths.TABLET_PATH, buyer.getId(), seller.getId(), electronic.getId(), electronic.getPrice());
-                break;
-            case "Tv":
+            }
+            case "Tv" -> {
                 TVService tvService = new TVService();
                 TV[] tvs = tvService.readTVData();
                 for (TV tv : tvs) {
@@ -76,14 +107,28 @@ public class PaymentService {
                     }
                 }
                 seller = findSeller(electronic);
-                paymentValidation(buyer, seller, electronic);
+                try {
+                    paymentValidation(buyer, seller, electronic);
+                } catch (ElectronicNotFoundException | NotEnoughFoundsException | SellerNotFoundException e) {
+                    e.printStackTrace();
+                }
                 makeTransaction(FilePaths.TV_PATH, buyer.getId(), seller.getId(), electronic.getId(), electronic.getPrice());
-                break;
-
+            }
+            default -> System.out.println("I'm Sorry,there is not the " + electronicType + " option,please try again.");
         }
     }
 
-    private static void paymentValidation(User buyer, User seller, Electronics electronicsToBuy) throws Exception {
+    /**
+     * This method checks if there is electronics to buy, the balance is enough or not
+     * and checks seller and throws exceptions.
+     *
+     * @param buyer
+     * @param seller
+     * @param electronicsToBuy
+     * @throws Exception
+     */
+    private static void paymentValidation(User buyer, User seller, Electronics electronicsToBuy)
+            throws ElectronicNotFoundException, NotEnoughFoundsException, SellerNotFoundException {
         if (electronicsToBuy == null) {
             throw new ElectronicNotFoundException();
         }
@@ -95,16 +140,37 @@ public class PaymentService {
         }
     }
 
-    private static void makeTransaction(String electronicsPath, UUID buyerId, UUID sellerId, UUID notebookId, int notebookPrice) throws IOException {
-        FileService.changeBalance(FilePaths.USERS_PATH, buyerId, -notebookPrice);
-        FileService.changeBalance(FilePaths.USERS_PATH, sellerId, notebookPrice);
-        FileService.removeLine(electronicsPath, String.valueOf(notebookId));
-        FileService.changeUserId(FilePaths.USER_PRODUCT_PATH, String.valueOf(buyerId), String.valueOf(notebookId));
+    /**
+     * This method calls every method that are responsible for transaction.
+     *
+     * @param electronicsPath
+     * @param buyerId
+     * @param sellerId
+     * @param electronicId
+     * @param electronicPrice
+     */
+    private static void makeTransaction(String electronicsPath, UUID buyerId, UUID sellerId, UUID electronicId,
+                                        int electronicPrice) {
+        FileService.changeBalance(FilePaths.USERS_PATH, buyerId, -electronicPrice);
+        FileService.changeBalance(FilePaths.USERS_PATH, sellerId, electronicPrice);
+        FileService.changeUserId(FilePaths.USER_PRODUCT_PATH, String.valueOf(buyerId), String.valueOf(electronicId));
+        FileService.changeProductStatus(electronicsPath, String.valueOf(electronicId));
     }
 
-    private static User findSeller(Electronics electronics) throws IOException {
+    /**
+     * This method find seller by user id from user product list.
+     *
+     * @param electronics
+     * @return
+     */
+    private static User findSeller(Electronics electronics) {
         User seller = new User();
-        List<String> users = FileService.read(FilePaths.USER_PRODUCT_PATH);
+        List<String> users = null;
+        try {
+            users = FileService.read(FilePaths.USER_PRODUCT_PATH);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         if (electronics != null) {
             for (String user : users) {
                 String[] line = user.split(",");

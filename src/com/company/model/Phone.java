@@ -1,9 +1,19 @@
 package com.company.model;
 
+/**
+ * This is Phone's model class
+ *
+ * @author Ani Amaryan
+ */
 public class Phone extends Electronics {
     private boolean hasCamera;
     private double cameraResolution;
 
+    /**
+     * This method return information about phone.
+     *
+     * @return phone data.
+     */
     @Override
     public String printElectronicData() {
         return super.printElectronicData() + "Camera = '" + isHasCamera() + '\'' + "\n" +

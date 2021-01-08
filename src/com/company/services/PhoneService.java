@@ -1,35 +1,58 @@
 package com.company.services;
 
-
 import com.company.exceptions.IntException;
 import com.company.exceptions.StringException;
 import com.company.model.FilePaths;
 import com.company.model.Phone;
+
+import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
+/**
+ * This is Phone's service
+ *
+ * @author Ani Amaryan
+ */
 public class PhoneService extends ElectronicsService implements CameraManager {
     private Phone phone;
 
-    public PhoneService() {
-    }
+    /**
+     * This method read phone's data from PHONE_PATH and stored it in phone object
+     *
+     * @return
+     */
+    public Phone[] readPhoneData() {
 
-    public Phone[] readPhoneData() throws Exception {
-
-        List<String> read = FileService.read(FilePaths.PHONE_PATH);
+        List<String> read = null;
+        try {
+            read = FileService.read(FilePaths.PHONE_PATH);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         Phone[] phones = new Phone[read.size()];
 
         for (int i = 0; i < read.size(); i++) {
-            String[] notebookArray = read.get(i).split(",");
+            String[] phoneArray = read.get(i).split(",");
             phones[i] = new Phone();
-            phones[i].setManufacturer(notebookArray[0]);
-            phones[i].setModel(notebookArray[1]);
-            phones[i].setPrice(Integer.parseInt(notebookArray[2]));
-            phones[i].setUnderWarranty(notebookArray[3].equals("Yes"));
-            phones[i].setScreenSize(Double.parseDouble(notebookArray[4]));
-            phones[i].setHasCamera(notebookArray[5].equals("Yes"));
-            phones[i].setCameraResolution(Double.parseDouble(notebookArray[6]));
+            phones[i].setId(UUID.fromString(phoneArray[0]));
+            try {
+                phones[i].setManufacturer(phoneArray[1]);
+            } catch (StringException e) {
+                e.printStackTrace();
+            }
+            phones[i].setModel(phoneArray[2]);
+            try {
+                phones[i].setPrice(Integer.parseInt(phoneArray[3]));
+            } catch (IntException e) {
+                e.printStackTrace();
+            }
+            phones[i].setUnderWarranty(phoneArray[4].equals("Yes"));
+            phones[i].setScreenSize(Double.parseDouble(phoneArray[5]));
+            phones[i].setProductStatus(phoneArray[6]);
+            phones[i].setHasCamera(phoneArray[7].equals("Yes"));
+            phones[i].setCameraResolution(Double.parseDouble(phoneArray[8]));
         }
         return phones;
     }
@@ -44,22 +67,31 @@ public class PhoneService extends ElectronicsService implements CameraManager {
         phone.setCameraResolution(scanner.nextDouble());
     }
 
-    public void writeAllData(){
-        FileService.writeData(FilePaths.PHONE_PATH, toString());
-    }
-
     @Override
     public String toString() {
-        final String camera = (phone.isHasCamera() ? "Yes" : "No");
+        final String camera = "," + (phone.isHasCamera() ? "Yes" : "No");
         final String resolution = "," + phone.getCameraResolution();
         return super.toString() + camera + resolution;
     }
 
-    public UUID createPhone() throws Exception {
+    /**
+     * This method create phone and returns phone UUID.
+     *
+     * @return phone's UUID
+     */
+    public UUID createPhone() {
         phone = new Phone();
         phone = (Phone) createBasicCritters(phone);
         createCameraCritters();
         System.out.println("Phone created !!!\n");
         return phone.getId();
     }
+
+    /**
+     * This method writes all phone's data in PHONE_PATH.
+     */
+    public void writeAllData() {
+        FileService.writeData(FilePaths.PHONE_PATH, toString());
+    }
+
 }

@@ -1,9 +1,19 @@
 package com.company.model;
 
+/**
+ * This is TV's model class
+ *
+ * @author Ani Amaryan
+ */
 public class TV extends Electronics {
     private boolean isColorTV;
     private boolean isFullHD;
 
+    /**
+     * This method return information about TV.
+     *
+     * @return tv data.
+     */
     @Override
     public String printElectronicData() {
         return super.printElectronicData() + "Color = '" + isColorTV() + '\'' + "\n" +

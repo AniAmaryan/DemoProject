@@ -9,11 +9,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 /**
- * This class works with files
+ * This class works with files.
  *
  * @author Ani Amaryan
  */
@@ -30,12 +32,25 @@ public class FileService {
         return Files.readAllLines(Paths.get(path));
     }
 
-    public static void changeBalance(String path, UUID userId, int newBalance) throws IOException {
+    /**
+     * This method changes old balance to new balance and writes changed balance in txt file.
+     *
+     * @param path
+     * @param userId
+     * @param newBalance
+     * @throws IOException
+     */
+    public static void changeBalance(String path, UUID userId, int newBalance) {
 
         Path pathForOverwrite = Paths.get(path);
         Charset charset = StandardCharsets.UTF_8;
 
-        List<String> read = FileService.read(path);
+        List<String> read = null;
+        try {
+            read = FileService.read(path);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         StringBuilder changedString = new StringBuilder();
         for (String s : read) {
             String[] line = s.split(",");
@@ -52,9 +67,19 @@ public class FileService {
             }
         }
         String result = changedString.toString();
-        Files.writeString(pathForOverwrite, result, charset);
+        try {
+            Files.writeString(pathForOverwrite, result, charset);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
+    /**
+     * This method writes data in txt file, using path and String data.
+     *
+     * @param path
+     * @param data
+     */
     public static void writeData(String path, String data) {
         FileWriter fw = null;
         BufferedWriter bw = null;
@@ -78,39 +103,27 @@ public class FileService {
         }
     }
 
-    public static void removeLine(String path, String electronicId) throws IOException {
+    /**
+     * This method changes product status from TO_SELL to SOLD and writes in txt file.
+     *
+     * @param path
+     * @param electronicId
+     */
+    public static void changeProductStatus(String path, String electronicId) {
         Path pathForOverwrite = Paths.get(path);
         Charset charset = StandardCharsets.UTF_8;
 
-        List<String> read = read(path);
-        StringBuilder changedString = new StringBuilder();
-        for (String s : read) {
-            String[] line = s.split(",");
-            if (!(line[0].equals(electronicId))) {
-                for (int j = 0; j < line.length; j++) {
-                    changedString.append(line[j]);
-                    if (j != line.length - 1) {
-                        changedString.append(",");
-                    } else {
-                        changedString.append("\n");
-                    }
-                }
-            }
+        List<String> read = null;
+        try {
+            read = read(path);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        String result = changedString.toString();
-        Files.writeString(pathForOverwrite, result, charset);
-    }
-
-    public static void changeUserId(String path, String userId, String soldProductId) throws IOException {
-        Path pathForOverwrite = Paths.get(path);
-        Charset charset = StandardCharsets.UTF_8;
-
-        List<String> read = read(path);
         StringBuilder changedString = new StringBuilder();
         for (String s : read) {
             String[] line = s.split(",");
-            if ((line[1].equals(soldProductId))) {
-                line[0] = userId;
+            if ((line[0].equals(electronicId))) {
+                line[6] = "SOLD";
             }
             for (int j = 0; j < line.length; j++) {
                 changedString.append(line[j]);
@@ -122,6 +135,53 @@ public class FileService {
             }
         }
         String result = changedString.toString();
-        Files.writeString(pathForOverwrite, result, charset);
+
+        try {
+            Files.writeString(pathForOverwrite, result, charset);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * This method changes User id and writes in txt file.
+     *
+     * @param path
+     * @param userId
+     * @param soldProductId
+     */
+    public static void changeUserId(String path, String userId, String soldProductId) {
+        Path pathForOverwrite = Paths.get(path);
+        Charset charset = StandardCharsets.UTF_8;
+
+        List<String> read = null;
+        try {
+            read = read(path);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        StringBuilder changedString = new StringBuilder();
+        for (String s : read) {
+            String[] line = s.split(",");
+            if ((line[1].equals(soldProductId))) {
+                line[0] = userId;
+                line[2] = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss").format(new Date());
+                line[3] = "SOLD";
+            }
+            for (int j = 0; j < line.length; j++) {
+                changedString.append(line[j]);
+                if (j != line.length - 1) {
+                    changedString.append(",");
+                } else {
+                    changedString.append("\n");
+                }
+            }
+        }
+        String result = changedString.toString();
+        try {
+            Files.writeString(pathForOverwrite, result, charset);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -2,7 +2,6 @@ package com.company.model;
 
 import com.company.services.MD5AlgorithmService;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -17,8 +16,6 @@ public class User {
     private String email;
     private String password;
     private int balance;
-    private List<String> userProducts;
-
 
     /**
      * toString returns string for writing in database.
@@ -31,6 +28,11 @@ public class User {
                 + getPassword() + "," + getBalance();
     }
 
+    /**
+     * This method return information about user.
+     *
+     * @return user data.
+     */
     public String userPersonalData() {
         return "ID = '" + getId() + '\'' + "\n" +
                 "Full name = '" + getFullName() + '\'' + "\n" +
@@ -39,7 +41,15 @@ public class User {
                 "Balance = '" + getBalance() + '\'' + "\n";
     }
 
-
+    /**
+     * User's constructor
+     *
+     * @param fullName
+     * @param username
+     * @param email
+     * @param password
+     * @param balance
+     */
     public User(String fullName, String username, String email, String password, int balance) {
         this.id = UUID.randomUUID();
         this.fullName = fullName;
@@ -98,13 +108,5 @@ public class User {
 
     public void setBalance(int balance) {
         this.balance = balance;
-    }
-
-    public List<String> getUserProducts() {
-        return userProducts;
-    }
-
-    public void setUserProducts(List<String> userProducts) {
-        this.userProducts = userProducts;
     }
 }

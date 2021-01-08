@@ -1,11 +1,15 @@
 package com.company.model;
 
-
 import com.company.exceptions.IntException;
 import com.company.exceptions.StringException;
-import java.util.Scanner;
+
 import java.util.UUID;
 
+/**
+ * This is Electronics's model abstract class
+ *
+ * @author Ani Amaryan
+ */
 public abstract class Electronics {
     private UUID id;
     private String manufacturer;
@@ -13,67 +17,39 @@ public abstract class Electronics {
     private int price;
     private boolean isUnderWarranty;
     private double screenSize;
+    private String productStatus;
 
-    public void sortByPrice(Electronics[] electronics) throws IntException {
-        System.out.println("----------------------");
-        System.out.println("Sorting By Price: ");
-        boolean swapped = true;
-        while (swapped) {
-            swapped = false;
-            for (int i = 1; i < electronics.length; i++) {
-                if (electronics[i - 1].getPrice() > electronics[i].getPrice()) {
-                    Electronics temp = electronics[i];
-                    electronics[i] = electronics[i - 1];
-                    electronics[i - 1] = temp;
-                    swapped = true;
-                }
-            }
-        }
-        for (Electronics el : electronics) {
-            System.out.println(el.printElectronicData());
-        }
-    }
-
-    public void createBasicCritters() throws StringException, IntException {
-        setId(UUID.randomUUID());
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter manufacturer");
-        setManufacturer(scanner.next());
-        System.out.println("Enter model");
-        setModel(scanner.next());
-        System.out.println("Enter price");
-        setPrice(scanner.nextInt());
-        System.out.println("Enter is the device under warranty: Y for (Yes) or N for (NO)");
-        char answer = scanner.next().charAt(0);
-        setUnderWarranty((answer == 'y' || answer == 'Y'));
-        System.out.println("Enter screenSize");
-        setScreenSize(scanner.nextDouble());
-    }
-
+    /**
+     * This method return information about electronic.
+     *
+     * @return electronic data.
+     */
     public String printElectronicData() {
-        return "Manufacturer = '" + manufacturer + '\'' + "\n" +
+        return "Id = '" + id + '\'' + "\n" +
+                "Manufacturer = '" + manufacturer + '\'' + "\n" +
                 "Model = '" + model + '\'' + "\n" +
-                "Price = " + price + "\n" +
+                "Price = '" + price + '\'' + "\n" +
                 "IsUnderWarranty = " + (isUnderWarranty ? "Yes" : "No") + "\n" +
-                "ScreenSize = " + screenSize + "\n";
-    }
-
-    @Override
-    public String toString() {
-        return id + "," + manufacturer + "," + model + "," + price + ","
-                + (isUnderWarranty ? "Yes" : "No") + "," + screenSize + ",";
+                "ScreenSize = '" + screenSize + '\'' + "\n" +
+                "Status = '" + productStatus + '\'' + "\n";
     }
 
     public String getManufacturer() {
         return manufacturer;
     }
 
+    /**
+     * This is manufacturer's setter method and in this method checks if
+     * the manufacturer's name is empty or matches regex.
+     *
+     * @param manufacturer
+     * @throws StringException
+     */
     public void setManufacturer(String manufacturer) throws StringException {
         String regex = "[A-Za-z !,?._'@]+";
         if (!manufacturer.isEmpty() && manufacturer.matches(regex)) {
             this.manufacturer = manufacturer;
         } else {
-            System.out.println("Invalid option");
             throw new StringException("Invalid option: " + manufacturer);
         }
     }
@@ -98,6 +74,12 @@ public abstract class Electronics {
         return price;
     }
 
+    /**
+     * This is price's setter method and in this method checks if the price not negative
+     *
+     * @param price
+     * @throws IntException
+     */
     public void setPrice(int price) throws IntException {
         if (price > 0) {
             this.price = price;
@@ -120,6 +102,14 @@ public abstract class Electronics {
 
     public void setScreenSize(double screenSize) {
         this.screenSize = screenSize;
+    }
+
+    public String getProductStatus() {
+        return productStatus;
+    }
+
+    public void setProductStatus(String productStatus) {
+        this.productStatus = productStatus;
     }
 }
 

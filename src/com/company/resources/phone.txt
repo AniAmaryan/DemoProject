@@ -1,2 +1,0 @@
-ff3e0a0e-e1f0-4d5e-88ee-cd1f0a325efb,asdda,asdasd,444,Yes,45.3,No,45.1
-79078356-7e63-4089-8a92-f91b30dd81da,aaaaaa,aaaaaa,100000,Yes,12.12,Yes,12.789

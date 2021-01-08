@@ -1,9 +1,19 @@
 package com.company.model;
 
+/**
+ * This is Tablet's model class
+ *
+ * @author Ani Amaryan
+ */
 public class Tablet extends Electronics {
     private boolean hasCamera;
     private double cameraResolution;
 
+    /**
+     * This method return information about tablet.
+     *
+     * @return tablet data.
+     */
     @Override
     public String printElectronicData() {
         return super.printElectronicData() + "Camera = '" + isHasCamera() + '\'' + "\n" +

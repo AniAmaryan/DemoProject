@@ -1,35 +1,37 @@
 package com.company.services;
 
-import com.company.exceptions.UserBalanceValidationException;
-import com.company.exceptions.UserFullNameValidationException;
-import com.company.exceptions.UserPasswordValidationException;
-import com.company.exceptions.UserUsernameValidationException;
+import com.company.exceptions.*;
 import com.company.model.FilePaths;
 import com.company.model.User;
+
 import java.io.IOException;
 import java.util.List;
 
 /**
  * This class for validation
+ *
+ * @author Ani Amaryan
  */
 public class UserValidationService {
 
     /**
      * This method checks if the email is valid or not with regex
+     *
      * @param email
      */
-    protected static void isValidEmail(String email) {
+    protected static void isValidEmail(String email) throws UserEmailValidationException {
         String regex = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
         if (!email.matches(regex)) {
-            System.out.print("Invalid email");
+            throw new UserEmailValidationException();
         }
     }
 
     /**
      * This method checks if the full name contain only letters
+     *
      * @param fullName
      */
-    protected static void isValidFullName(String fullName) throws Exception {
+    protected static void isValidFullName(String fullName) throws UserFullNameValidationException {
         String regex = "^[\\p{L} .'-]+$";
         if (!fullName.matches(regex)) {
             throw new UserFullNameValidationException();
@@ -38,9 +40,10 @@ public class UserValidationService {
 
     /**
      * This method check password
+     *
      * @param password
      */
-    protected static void isValidPassword(String password) throws Exception {
+    protected static void isValidPassword(String password) throws UserPasswordValidationException {
         int countOfUppercase = 0;
         int countOfDigits = 0;
         char chars;
@@ -59,20 +62,22 @@ public class UserValidationService {
 
     /**
      * This method check balance
+     *
      * @param balance
      */
     protected static void isValidBalance(int balance) throws UserBalanceValidationException {
-        if(balance <0){
-           throw new UserBalanceValidationException();
+        if (balance < 0) {
+            throw new UserBalanceValidationException();
         }
     }
 
     /**
      * This method check username
+     *
      * @param username
      * @throws IOException
      */
-    protected static void isValidUsername(String username) throws Exception {
+    protected static void isValidUsername(String username) throws UserUsernameValidationException, IOException {
         if (!isValidUsernameLength(username) || !isUsernameDuplicate(username)) {
             throw new UserUsernameValidationException();
         }
@@ -80,6 +85,7 @@ public class UserValidationService {
 
     /**
      * This method check username length
+     *
      * @param username
      * @return
      */
@@ -93,6 +99,7 @@ public class UserValidationService {
 
     /**
      * This method check if the username have duplicate in database
+     *
      * @param username
      * @return
      * @throws IOException
@@ -113,10 +120,11 @@ public class UserValidationService {
 
     /**
      * Checking user
+     *
      * @param user
      * @throws IOException
      */
-    public static void isValidUser(User user) throws Exception {
+    public static void isValidUser(User user) throws UserValidationException, IOException {
         isValidFullName(user.getFullName());
         isValidUsername(user.getUsername());
         isValidEmail(user.getEmail());

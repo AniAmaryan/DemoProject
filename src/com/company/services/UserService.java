@@ -1,5 +1,6 @@
 package com.company.services;
 
+import com.company.exceptions.UserValidationException;
 import com.company.model.FilePaths;
 import com.company.model.User;
 
@@ -23,7 +24,7 @@ public class UserService {
      * @return new User
      * @throws IOException
      */
-    public User create() throws Exception {
+    public User create() throws IOException {
         user = new User();
         System.out.println("Please enter your full name");
         user.setFullName(scanner.nextLine());
@@ -37,13 +38,17 @@ public class UserService {
         System.out.println("Please enter balance");
         user.setBalance(scanner.nextInt());
 
-        UserValidationService.isValidUser(user);
+        try {
+            UserValidationService.isValidUser(user);
+        } catch (UserValidationException e) {
+            e.printStackTrace();
+        }
 
         return new User(user.getFullName(), user.getUsername(), user.getEmail(), user.getPassword(), user.getBalance());
     }
 
     /**
-     * This method add the user data to the database.
+     * This method add the user data to the users.txt.
      *
      * @param user
      */
@@ -57,7 +62,7 @@ public class UserService {
      *
      * @throws IOException
      */
-    public void loginUser() throws Exception {
+    public void loginUser() throws IOException {
         System.out.println("Please enter your username");
         String userName = scanner.nextLine();
         System.out.println("Please enter your password");
